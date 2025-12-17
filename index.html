@@ -7,11 +7,13 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap");
+            /* Changed to JetBrains Mono */
+            @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600&display=swap");
+
             body {
                 background-color: #000;
                 color: #fff;
-                font-family: "Inter", sans-serif;
+                font-family: "JetBrains Mono", monospace;
                 -webkit-font-smoothing: antialiased;
             }
             .tabular {
@@ -209,26 +211,42 @@
                         fetch("/api/speed").then((r) => r.json()),
                     ]);
 
-                    cpu.innerText = `${Math.round(stats.cpu)}%`;
-                    ram.innerText = `${Math.round(stats.ram)}%`;
-                    disk.innerText = `${Math.round(stats.disk)}%`;
-                    uptime.innerText = stats.uptime;
-                    downSpeed.innerText = fmt(speed.down, true);
-                    upSpeed.innerText = fmt(speed.up, true);
-                    ping.innerText = `${speed.ping}ms`;
-                    totalDown.innerText = fmt(stats.total_down);
-                    totalUp.innerText = fmt(stats.total_up);
+                    document.getElementById("cpu").innerText =
+                        `${Math.round(stats.cpu)}%`;
+                    document.getElementById("ram").innerText =
+                        `${Math.round(stats.ram)}%`;
+                    document.getElementById("disk").innerText =
+                        `${Math.round(stats.disk)}%`;
+                    document.getElementById("uptime").innerText = stats.uptime;
+                    document.getElementById("downSpeed").innerText = fmt(
+                        speed.down,
+                        true,
+                    );
+                    document.getElementById("upSpeed").innerText = fmt(
+                        speed.up,
+                        true,
+                    );
+                    document.getElementById("ping").innerText =
+                        `${speed.ping}ms`;
+                    document.getElementById("totalDown").innerText = fmt(
+                        stats.total_down,
+                    );
+                    document.getElementById("totalUp").innerText = fmt(
+                        stats.total_up,
+                    );
 
                     const now = new Date();
-                    clock.innerText = now.toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    date.innerText = now.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                    });
+                    document.getElementById("clock").innerText =
+                        now.toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+                    document.getElementById("date").innerText =
+                        now.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                        });
                 } catch {}
             }
 
