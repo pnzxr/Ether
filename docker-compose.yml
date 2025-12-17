@@ -1,7 +1,6 @@
 services:
-  Ether:
+  ether:
     build: .
-    container_name: Ether
     restart: unless-stopped
     privileged: true
     network_mode: host
