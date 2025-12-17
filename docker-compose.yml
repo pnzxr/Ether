@@ -1,0 +1,13 @@
+services:
+  Ether:
+    build: .
+    container_name: Ether
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    volumes:
+      - /:/host:ro
+    environment:
+      - TZ=Asia/Kolkata
+      - LAT=28.7041
+      - LON=77.1025

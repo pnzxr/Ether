@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ether</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap");
+            body {
+                background-color: #000;
+                color: #fff;
+                font-family: "Inter", sans-serif;
+                -webkit-font-smoothing: antialiased;
+            }
+            .tabular {
+                font-variant-numeric: tabular-nums;
+            }
+            .card {
+                background-color: #050505;
+                border: 1px solid rgba(255, 255, 255, 0.03);
+                border-radius: 2.5rem;
+                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+            .card:hover {
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 0 40px 5px rgba(255, 255, 255, 0.05);
+                transform: translateY(-2px);
+            }
+            .label {
+                font-size: 9px;
+                text-transform: uppercase;
+                letter-spacing: 0.3em;
+                opacity: 0.25;
+                font-weight: 700;
+            }
+        </style>
+    </head>
+    <body class="flex items-center justify-center min-h-screen p-6">
+        <div class="w-full max-w-md space-y-4">
+            <div class="flex justify-between items-start px-4 mb-10">
+                <div class="flex items-center gap-5">
+                    <div id="weather-icon-box" class="opacity-80">
+                        <i data-lucide="sun" class="w-10 h-10 stroke-[1]"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span
+                            id="w-temp"
+                            class="text-3xl font-extralight tabular leading-none"
+                            >--°C</span
+                        >
+                        <p
+                            id="w-desc"
+                            class="label mt-2 max-w-[160px] truncate"
+                        >
+                            Locating...
+                        </p>
+                    </div>
+                </div>
+                <div class="text-right flex flex-col">
+                    <span
+                        id="clock"
+                        class="text-4xl font-extralight tabular tracking-tighter leading-none"
+                        >00:00</span
+                    >
+                    <p id="date" class="label mt-2">--- --, ----</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div
+                    class="card p-8 flex flex-col items-center justify-center h-48 space-y-3"
+                >
+                    <i
+                        data-lucide="cpu"
+                        class="w-5 h-5 opacity-20 stroke-[1.2]"
+                    ></i>
+                    <span class="label">Processor</span>
+                    <span
+                        id="cpu"
+                        class="text-5xl font-light tabular text-orange-400"
+                        >--%</span
+                    >
+                </div>
+                <div
+                    class="card p-8 flex flex-col items-center justify-center h-48 space-y-3"
+                >
+                    <i
+                        data-lucide="layers"
+                        class="w-5 h-5 opacity-20 stroke-[1.2]"
+                    ></i>
+                    <span class="label">Memory</span>
+                    <span
+                        id="ram"
+                        class="text-5xl font-light tabular text-emerald-400"
+                        >--%</span
+                    >
+                </div>
+            </div>
+
+            <div
+                class="card grid grid-cols-2 gap-4 divide-x divide-white/5 py-10"
+            >
+                <div class="flex flex-col items-center space-y-3">
+                    <span class="label !opacity-10">Download</span>
+                    <span
+                        id="downSpeed"
+                        class="text-2xl font-medium text-blue-400 tabular"
+                        >0.0 MB/s</span
+                    >
+                </div>
+                <div class="flex flex-col items-center space-y-3">
+                    <span class="label !opacity-10">Upload</span>
+                    <span
+                        id="upSpeed"
+                        class="text-2xl font-medium text-purple-400 tabular"
+                        >0.0 MB/s</span
+                    >
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+                <div class="card p-5 flex flex-col items-center">
+                    <span class="label mb-2">Disk</span>
+                    <span
+                        id="disk"
+                        class="text-sm font-medium opacity-60 tabular"
+                        >--%</span
+                    >
+                </div>
+                <div class="card p-5 flex flex-col items-center">
+                    <span class="label mb-2">Ping</span>
+                    <span
+                        id="ping"
+                        class="text-sm font-medium opacity-60 tabular"
+                        >--</span
+                    >
+                </div>
+                <div class="card p-5 flex flex-col items-center">
+                    <span class="label mb-2">Uptime</span>
+                    <span
+                        id="uptime"
+                        class="text-sm font-medium opacity-60 tabular whitespace-nowrap"
+                        >--</span
+                    >
+                </div>
+            </div>
+
+            <div class="flex justify-between px-10 pt-6">
+                <div class="flex flex-col items-start">
+                    <span class="label mb-1 !text-[7px]">Received</span>
+                    <span
+                        id="totalDown"
+                        class="label !opacity-25 tabular tracking-widest"
+                        >--</span
+                    >
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="label mb-1 !text-[7px]">Sent</span>
+                    <span
+                        id="totalUp"
+                        class="label !opacity-25 tabular tracking-widest"
+                        >--</span
+                    >
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function fmt(bytes, isSpeed = false) {
+                if (!bytes) return isSpeed ? "0 B/s" : "0 B";
+                const units = ["B", "KB", "MB", "GB", "TB"];
+                let i = 0;
+                while (bytes >= 1024 && i < units.length - 1) {
+                    bytes /= 1024;
+                    i++;
+                }
+                return `${bytes.toFixed(1)} ${units[i]}${isSpeed ? "/s" : ""}`;
+            }
+
+            async function updateWeather() {
+                try {
+                    const data = await fetch("/api/weather").then((r) =>
+                        r.json(),
+                    );
+                    const icons = {
+                        0: "sun",
+                        1: "cloud-sun",
+                        3: "cloud",
+                        61: "cloud-rain",
+                        95: "cloud-lightning",
+                    };
+                    document.getElementById("weather-icon-box").innerHTML =
+                        `<i data-lucide="${icons[data.code] || "sun"}" class="w-10 h-10 stroke-[1]"></i>`;
+                    document.getElementById("w-temp").innerText =
+                        `${Math.round(data.temp)}°C`;
+                    document.getElementById("w-desc").innerText = data.location;
+                    lucide.createIcons();
+                } catch {}
+            }
+
+            async function update() {
+                try {
+                    const [stats, speed] = await Promise.all([
+                        fetch("/api/stats").then((r) => r.json()),
+                        fetch("/api/speed").then((r) => r.json()),
+                    ]);
+
+                    cpu.innerText = `${Math.round(stats.cpu)}%`;
+                    ram.innerText = `${Math.round(stats.ram)}%`;
+                    disk.innerText = `${Math.round(stats.disk)}%`;
+                    uptime.innerText = stats.uptime;
+                    downSpeed.innerText = fmt(speed.down, true);
+                    upSpeed.innerText = fmt(speed.up, true);
+                    ping.innerText = `${speed.ping}ms`;
+                    totalDown.innerText = fmt(stats.total_down);
+                    totalUp.innerText = fmt(stats.total_up);
+
+                    const now = new Date();
+                    clock.innerText = now.toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                    date.innerText = now.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                    });
+                } catch {}
+            }
+
+            setInterval(update, 2000);
+            setInterval(updateWeather, 600000);
+            update();
+            updateWeather();
+            lucide.createIcons();
+        </script>
+    </body>
+</html>
